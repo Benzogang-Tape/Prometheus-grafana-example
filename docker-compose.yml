@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  hw_8:
+    image: benzogangtape/hw_8:latest
+    container_name: hw8_service
+    ports:
+      - "8000:8000"
+      - "8081:8081"
+    depends_on:
+      - prometheus
+
+  spammer:
+    image: skinass/edu-vk-client
+    container_name: spammer
+    command: /usr/local/bin/client
+    environment:
+      - SERVER_ADDR=localhost:8000 #linux
+#      - SERVER_ADDR=host.docker.internal:8000 #mac/windows
+    network_mode: host
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    expose:
+      - 9090
+    volumes:
+      - "./prometheus:/etc/prometheus"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    links:
+      - prometheus:prometheus # datasource = http://prometheus:9090
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=<login>
+      - GF_SECURITY_ADMIN_PASSWORD=<password>
+    user: "104"
+    volumes:
+      - "./grafana/datasources:/etc/grafana/provisioning/datasources/"
+      - "./grafana/dashboards:/etc/grafana/provisioning/dashboards/"
+      - "grafana:/var/lib/grafana"
+
+volumes:
+  grafana:

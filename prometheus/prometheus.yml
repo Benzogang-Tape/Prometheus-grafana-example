@@ -1,0 +1,7 @@
+global:
+  scrape_interval:     5s
+
+scrape_configs:
+  - job_name: "hw_8"
+    static_configs:
+      - targets: ["hw_8:8081"]
